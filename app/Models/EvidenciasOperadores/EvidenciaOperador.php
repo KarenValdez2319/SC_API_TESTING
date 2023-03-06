@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models\EvidenciasOperadores;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class EvidenciaOperador extends Model
+{
+    use HasFactory;
+
+    protected $table = 'ope_evidencia_operadores';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+
+        'id',
+        'id_usuario',
+        'id_unidad',
+        'odometro',
+        'archivo_odometro',
+        'fecha_ingreso',
+        'litros',
+        'archivo_ticket'
+    ];
+}
