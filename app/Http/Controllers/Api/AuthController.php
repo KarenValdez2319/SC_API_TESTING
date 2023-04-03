@@ -30,12 +30,12 @@ class AuthController extends Controller
             $password = $request->input('password');
 
             //Validar si existe en la base de datos
-            $user = User::select('id', 'usuario', 'password')->where('usuario', $usuario)->first();
+            $user = User::select('id', 'usuario', 'password', 'rol')->where('usuario', $usuario)->first();
 
             if (empty($user)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Usuario y/o Password Erroneos.'
+                    'message' => 'Usuario y/o Password Incorrectos.'
                 ], 404);
             }
 
@@ -44,16 +44,23 @@ class AuthController extends Controller
             if (!$passwordValidado) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Usuario y/o Password Erroneos.'
+                    'message' => 'Usuario y/o Password Incorrectos.'
                 ], 404);
             }
 
             $token = auth()->login($user);
 
-            return response()->json([
-                'usuario' => $user,
-                'token' => $token,
+            $usuario = [
+                'id' => $user->id,
+                'usuario' => $user->usuario,
+                'rol' => $user->rol,
                 'token_type' => 'bearer',
+                'token' => $token,
+            ];
+
+            return response([
+                "statusCode" => 200,
+                'usuario' => $usuario,
             ], 200);
         }
 
@@ -78,12 +85,12 @@ class AuthController extends Controller
                 'apellidos' => ['required', 'string'],
                 'usuario' => ['required', 'string'],
                 'password' => ['required', 'string', 'min:6'],
-                'administrador' => ['required', 'numeric']
+                'rol' => ['required', 'string']
 
             ]);
 
 
-            $datos = $request->only('usuario', 'nombre', 'apellidos', 'password', 'administrador');
+            $datos = $request->only('usuario', 'nombre', 'apellidos', 'password', 'rol');
 
 
             $user = User::where('usuario', $datos['usuario'])->first();
@@ -98,12 +105,11 @@ class AuthController extends Controller
             }
 
             $usuario = User::create([
-
                 'nombre' => $datos['nombre'],
                 'apellidos' => $datos['apellidos'],
                 'usuario' => $datos['usuario'],
                 'password' => Hash::make($datos['password']),
-                'administrador' => $datos(['administrador'])
+                'rol' => $datos['rol']
             ]);
 
 
@@ -126,7 +132,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json([
+        return response([
             'status' => 'success',
             'message' => "Cierre de sesion exitosa"
         ], 200);
@@ -134,6 +140,16 @@ class AuthController extends Controller
 
     public function informacion_usuario()
     {
-        return response()->json(auth()->user());
+        $informacionUsuario = auth()->user();
+
+        $usuario = [
+            'id' => $informacionUsuario->id,
+            'nombre' => $informacionUsuario->nombre,
+            'apellidos' => $informacionUsuario->apellidos,
+            'usuario' => $informacionUsuario->usuario,
+            'rol' => $informacionUsuario->rol,
+        ];
+
+        return response(["statusCode" => 200, "usuario" => $usuario], 200);
     }
 }
