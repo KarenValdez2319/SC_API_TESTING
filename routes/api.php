@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdministradorController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EvidenciaOperadorController;
+use App\Http\Controllers\Api\MesaControlController;
 use App\Http\Controllers\Api\MonitoristaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -18,12 +19,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['prefix' => 'auth'], function ($router) {
+Route::post('auth/login', [AuthController::class, 'login'])->name('auth.login');
+Route::post('auth/registro', [AuthController::class, 'registro'])->name('auth.registro');
+
+Route::middleware('auth:sanctum')->prefix('auth')->group(function ($router) {
 
     //Rutas para el login del usuario
-    Route::post('login', [AuthController::class, 'login'])->name('auth.login');
     Route::get('logout', [AuthController::class, 'logout'])->name('auth.logout');
-    Route::post('registro', [AuthController::class, 'registro'])->name('auth.registro');
     Route::get('informacion_usuario', [AuthController::class, 'informacion_usuario'])->name('auth.informacio_usuario');
 });
 
@@ -43,10 +45,21 @@ Route::group(['prefix' => 'monitorista'], function ($router) {
     Route::get('seguimiento_viaje/{idViaje}', [MonitoristaController::class, 'seguimiento_viaje']);
     Route::post('registro_seguimiento/{idViaje}', [MonitoristaController::class, 'registro_seguimiento']);
     Route::post('finalizar_viaje/{idViaje}', [MonitoristaController::class, 'finalizar_viaje']);
+    Route::get('obtener_coordenadas/{idViaje}', [MonitoristaController::class,'obtener_coordenadas']);
+    
 });
 
 
 Route::group(['prefix' => 'administrador'], function ($router) {
     Route::get('buscar_viajes', [AdministradorController::class, 'buscar_viajes']);
     Route::get('buscar_viaje/{idViaje}', [AdministradorController::class, 'buscar_viaje']);
+});
+
+Route::group(['prefix' => 'mesa_control'], function ($router){
+
+    Route::get('obtener_catalogos', [MesaControlController::class, 'obtener_catalogos']);
+    Route::post('solicitud_registro', [MesaControlController::class, 'solicitud_registro']);
+    Route::get('obtener_solicitudes/{tripSolicitud?}', [MesaControlController::class, 'obtener_solicitudes']);
+    Route::post('editar_solicitud/{tripSolicitud}', [MesaControlController::class, 'editar_solicitud']);
+
 });

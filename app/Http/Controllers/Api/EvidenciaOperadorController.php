@@ -84,27 +84,25 @@ class EvidenciaOperadorController extends Controller
 
     public function buscar_fecha(Request $request){
 
-        $request->validate([
-            'fecha_inicio' => ['required', 'date'],
-            'fecha_fin' => ['required', 'date']
+         $validated = $request->validate([
+            'fecha_inicio' => 'required',
+            'fecha_fin' => 'required'
         ]);
 
-        $fecha_inicio = $request->input('fecha_inicio');
-        $fecha_fin = $request->input('fecha_fin');
+        $fecha_inicio = $request->input('fecha_inicio') .' '. '00:00:01';
+        $fecha_fin = $request->input('fecha_fin') .' '. '23:59:59';
 
         if ($fecha_fin < $fecha_inicio) {
-
             return response([
                 'status' => '500',
                 'message' => 'La fecha final no puede ser mayor a la inicial'
             ], 500);
         }
 
-        $buscar_fecha = EvidenciaOperador::select('ope_evidencia_operadores.id', 'usuarios.usuario', DB::raw('concat(usuarios.nombre, " ", usuarios.apellidos) as nombre'), 'ope_unidades.numero_economico as no_economico', 'ope_unidades.placas', 'ope_evidencia_operadores.odometro', 'ope_evidencia_operadores.litros', 'ope_evidencia_operadores.archivo_odometro', 'ope_evidencia_operadores.archivo_ticket', DB::raw('date_format(ope_evidencia_operadores.fecha_registro, "%Y-%m-%d") as fecha_registro'))
-            ->join('ope_unidades', 'ope_unidades.id', '=', 'ope_evidencia_operadores.id_unidad')
-            ->join('usuarios', 'usuarios.id', '=', 'ope_evidencia_operadores.id_usuario')
-            ->whereBetween(DB::raw('date_format(ope_evidencia_operadores.fecha_registro, "%Y-%m-%d")'), [$fecha_inicio, $fecha_fin])
+        $buscar_fecha = Viajes_Ultimo_Estatus::select('id', 'trip', 'tipo_unidad', 'litros', 'km', 'linea_transporte', 'origen', 'operador', 'numero_economico', 'placas', 'estatus', 'fecha_registro')
+            ->whereBetween(DB::raw('date_format(fecha_registro, "%Y-%m-%d %H:%i:%s")'), [$fecha_inicio, $fecha_fin])
             ->get();
+
 
         if (!$buscar_fecha->isEmpty()) {
 
@@ -114,10 +112,14 @@ class EvidenciaOperadorController extends Controller
 
                 $datos = [
                     'id' => $buscar_fecha[$i]->id,
-                    'nombre' => $buscar_fecha[$i]->nombre,
+                    'trip' => $buscar_fecha[$i]->trip,
+                    'tipo_unidad' => $buscar_fecha[$i]->tipo_unidad,
+                    'origen' => $buscar_fecha[$i]->origen,
+                    'operador' => $buscar_fecha[$i]->operador,
+                    'estatus' => $buscar_fecha[$i]->estatus,
                     'no_economico' => $buscar_fecha[$i]->no_economico,
                     'placas' => $buscar_fecha[$i]->placas,
-                    'odometro' => $buscar_fecha[$i]->odometro,
+                    'km' => $buscar_fecha[$i]->km,
                     'archivo_odometro' => asset('/evidencia/') . "/" . $buscar_fecha[$i]->archivo_odometro,
                     'litros' => $buscar_fecha[$i]->litros,
                     'archivo_ticket' => asset('/evidencia/') . "/" . $buscar_fecha[$i]->archivo_ticket,

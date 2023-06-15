@@ -17,7 +17,9 @@ class AdministradorController extends Controller
 
         $viajes = Viajes_Ultimo_Estatus::all();
 
-        return response(["statusCode" => 200, "viajes" => $viajes], 200);
+        $excel_viajes = Viajes_Ultimo_Estatus::select('trip', 'tipo_unidad', 'litros', 'km', 'linea_transporte', 'origen', 'operador', 'numero_economico', 'placas', 'estatus', 'fecha_registro')->get();
+
+        return response(["statusCode" => 200, "viajes" => $viajes, 'excel_viajes' => $excel_viajes], 200);
 
         /*$busqueda = EvidenciaOperador::select('ope_evidencia_operadores.id', 'usuarios.usuario', DB::raw('concat(usuarios.nombre, " ", usuarios.apellidos) as nombre'), 'ope_unidades.numero_economico as no_economico', 'ope_unidades.placas', 'ope_evidencia_operadores.odometro', 'ope_evidencia_operadores.litros', 'ope_evidencia_operadores.archivo_odometro', 'ope_evidencia_operadores.archivo_ticket', DB::raw('date_format(ope_evidencia_operadores.fecha_registro, "%Y-%m-%d %H:%i:%s") as fecha_registro'))
             ->join('ope_unidades', 'ope_unidades.id', '=', 'ope_evidencia_operadores.id_unidad')
@@ -58,16 +60,16 @@ class AdministradorController extends Controller
         $seguimientos = SeguimientoViaje::select('ope_seguimiento_viajes.id', 'ope_seguimiento_viajes.comentarios', 'ope_estatus.descripcion as estatus', 'ope_seguimiento_viajes.fecha_registro')
                                             ->join('ope_estatus', 'ope_estatus.id', '=', 'ope_seguimiento_viajes.id_estatus')
                                             ->where('id_viaje', $idViaje)
-                                            ->orderBy('ope_estatus.orden', 'asc')
+                                            ->orderBy('ope_estatus.id', 'asc')
                                             ->get();
-                                            
+
         $odometroImagen = EvidenciaOperador::select('id', 'archivo_odometro')->where('id_viaje', $idViaje)->get();
         $ticketImage = EvidenciaOperador::select('id', 'archivo_ticket')->where('id_viaje', $idViaje)->get();
 
         $imagenesOdometro = [];
         $imagenesTicket = [];
 
-        for ($i=0; $i < count($odometroImagen); $i++) { 
+        for ($i=0; $i < count($odometroImagen); $i++) {
             $imagen = [
                 "id" => $odometroImagen[$i]->id,
                 "imagen" => asset('/evidencia').'/'.$odometroImagen[$i]->archivo_odometro,
@@ -76,7 +78,7 @@ class AdministradorController extends Controller
             array_push($imagenesOdometro, $imagen);
         }
 
-        for ($i=0; $i < count($ticketImage); $i++) { 
+        for ($i=0; $i < count($ticketImage); $i++) {
             $imagen = [
                 "id" => $ticketImage[$i]->id + 10000,
                 "imagen" => asset('/evidencia').'/'.$ticketImage[$i]->archivo_ticket,
@@ -95,4 +97,5 @@ class AdministradorController extends Controller
             'message' => 'Dato no encontrado'
         ], 404);
     }
+
 }

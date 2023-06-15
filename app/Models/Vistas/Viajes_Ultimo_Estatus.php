@@ -14,13 +14,13 @@ class Viajes_Ultimo_Estatus extends Model
 
     protected $fillable = [
         'id',
-        'viaje',
+        'trip',
         'tipo_unidad',
-        'litros', 
+        'litros',
         'km',
         'linea_transporte',
-        'fecha_inicio',
-        'fecha_entrega',
+        'fecha_cedis',
+        'fecha_descarga',
         'origen',
         'id_usuario',
         'operador',

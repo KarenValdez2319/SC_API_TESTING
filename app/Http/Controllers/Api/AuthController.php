@@ -6,14 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
+use App\Models\Sanctum\PersonalAccessToken;
+use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
+use Laravel\Sanctum\Sanctum;
 class AuthController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login', 'registro']]);
-    }
-
     public function login(Request $request)
     {
 
@@ -48,7 +45,7 @@ class AuthController extends Controller
                 ], 404);
             }
 
-            $token = auth()->login($user);
+            $token = $user->createToken('App')->plainTextToken;
 
             $usuario = [
                 'id' => $user->id,
@@ -64,7 +61,7 @@ class AuthController extends Controller
             ], 200);
         }
 
-        return response()->json([
+        return response ([
 
             'status' => 'error',
             'message' => 'Error en peticion, Header debe contener "Key:Accept", "Value:application/json"'
@@ -128,9 +125,23 @@ class AuthController extends Controller
         ], 500);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        auth()->logout();
+        /* $user = request()->user();
+
+        $user->tokens()->where('id', $user->currentAccessToken()->id)->delete(); */
+/*
+        $request->user()->currentAccessToken()->delete();
+
+        $user->tokens()->where('id',$tokenId)->delete(); */
+
+/*         $accessToken = $request->bearerToken();
+
+        $token = SanctumPersonalAccessToken::findToken($accessToken);
+
+        $token->delete(); */
+
+        $request->user()->currentAccessToken()->delete();
 
         return response([
             'status' => 'success',
@@ -138,18 +149,19 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function informacion_usuario()
+    public function informacion_usuario(Request $request)
     {
-        $informacionUsuario = auth()->user();
 
-        $usuario = [
-            'id' => $informacionUsuario->id,
-            'nombre' => $informacionUsuario->nombre,
-            'apellidos' => $informacionUsuario->apellidos,
-            'usuario' => $informacionUsuario->usuario,
-            'rol' => $informacionUsuario->rol,
+        $user =  $request->user();
+
+          $usuario = [
+            'id' => $user->id,
+            'nombre' => $user->nombre,
+            'apellidos' => $user->apellidos,
+            'usuario' => $user->usuario,
+            'rol' => $user->rol,
         ];
 
-        return response(["statusCode" => 200, "usuario" => $usuario], 200);
+        return response(['statusCode' => 200, 'usuario' => $usuario], 200);
     }
 }

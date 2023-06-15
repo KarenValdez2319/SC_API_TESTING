@@ -14,13 +14,13 @@ class BitacoraViajes extends Model
 
     protected $fillable = [
         'id',
-        'viaje',
+        'trip',
         'tipo_unidad',
         'id_unidad',
         'id_linea_transporte',
         'origen',
-        'fecha_entrega',
-        'fecha_inicio',
+        'fecha_cedis',
+        'fecha_descarga',
         'litros',
         'km',
         'id_usuario',
