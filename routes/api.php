@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EvidenciaOperadorController;
 use App\Http\Controllers\Api\MesaControlController;
 use App\Http\Controllers\Api\MonitoristaController;
+use App\Http\Controllers\WebHook\TestingST;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,7 +47,7 @@ Route::group(['prefix' => 'monitorista'], function ($router) {
     Route::post('registro_seguimiento/{idViaje}', [MonitoristaController::class, 'registro_seguimiento']);
     Route::post('finalizar_viaje/{idViaje}', [MonitoristaController::class, 'finalizar_viaje']);
     Route::get('obtener_coordenadas/{idViaje}', [MonitoristaController::class,'obtener_coordenadas']);
-    
+
 });
 
 
@@ -63,3 +64,7 @@ Route::group(['prefix' => 'mesa_control'], function ($router){
     Route::post('editar_solicitud/{tripSolicitud}', [MesaControlController::class, 'editar_solicitud']);
 
 });
+
+//Ruta para WebHook
+
+Route::post('webhook/testing_st', [TestingST::class, 'st_datos']);
