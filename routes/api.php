@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->prefix('auth')->group(function ($router) {
     Route::get('informacion_usuario', [AuthController::class, 'informacion_usuario'])->name('auth.informacio_usuario');
 });
 
-Route::group(['prefix' => 'operador'], function ($router) {
+Route::group([/* 'middleware' => ['auth:sanctum'],  */'prefix' => 'operador'], function ($router) {
     Route::get('asignacion_viaje/{idUsuario}', [EvidenciaOperadorController::class, 'obtener_viaje']);
     Route::post('nuevo_registro/{idViaje}', [EvidenciaOperadorController::class, 'nuevo_registro']);
     Route::get('buscar_usuario/', [EvidenciaOperadorController::class, 'buscar_usuario']);
@@ -38,7 +38,7 @@ Route::group(['prefix' => 'operador'], function ($router) {
     Route::post('buscar_fecha', [EvidenciaOperadorController::class, 'buscar_fecha']);
 });
 
-Route::group(['prefix' => 'monitorista'], function ($router) {
+Route::group([/* 'middleware' => ['auth:sanctum'], */ 'prefix' => 'monitorista'], function ($router) {
 
     Route::get('obtener_catalogos', [MonitoristaController::class, 'obtener_catalogos']);
     Route::get('obtener_viajes', [MonitoristaController::class, 'obtener_viajes']);
@@ -51,12 +51,12 @@ Route::group(['prefix' => 'monitorista'], function ($router) {
 });
 
 
-Route::group(['prefix' => 'administrador'], function ($router) {
+Route::group([/* 'middleware' => ['auth:sanctum'], */ 'prefix' => 'administrador'], function ($router) {
     Route::get('buscar_viajes', [AdministradorController::class, 'buscar_viajes']);
     Route::get('buscar_viaje/{idViaje}', [AdministradorController::class, 'buscar_viaje']);
 });
 
-Route::group(['prefix' => 'mesa_control'], function ($router){
+Route::group([/* 'middleware' => ['auth:sacntum'], */ 'prefix' => 'mesa_control'], function ($router){
 
     Route::get('obtener_catalogos', [MesaControlController::class, 'obtener_catalogos']);
     Route::post('solicitud_registro', [MesaControlController::class, 'solicitud_registro']);
@@ -68,3 +68,5 @@ Route::group(['prefix' => 'mesa_control'], function ($router){
 //Ruta para WebHook
 
 Route::post('webhook/testing_st', [TestingST::class, 'st_datos']);
+
+
